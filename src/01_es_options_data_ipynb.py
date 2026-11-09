@@ -172,7 +172,7 @@ decoded
 # %%
 put = examples.iloc[0]
 print(f"Read aloud: {put['symbol']} is the right to sell one {put['underlying']} future at {put['strike']:,.0f} "
-      f"on {put['expiration']:%B %-d, %Y}.")
+      f"on {put['expiration']:%B %#d, %Y}.")
 
 # %% [markdown]
 # And this is what the table itself looks like: one row per contract per

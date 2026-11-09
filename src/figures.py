@@ -113,14 +113,14 @@ def fig_futures_curve(curve, on, underlyings=()):
         fig.add_trace(go.Scatter(
             x=c["expiration"], y=c[y], mode="markers", name=name, marker=dict(color=color, size=size),
             customdata=np.column_stack([c["symbol"], c["contract month"]]),
-            hovertemplate="%{customdata[0]} (%{customdata[1]})<br>expires %{x|%b %-d, %Y}<br>"
+            hovertemplate="%{customdata[0]} (%{customdata[1]})<br>expires %{x|%b %#d, %Y}<br>"
                           "%{y:.2f}% above the nearest contract<extra></extra>"))
     fig.add_trace(go.Scatter(x=curve["expiration"], y=curve[y], mode="lines", showlegend=False,
                              line=dict(color=GREY, width=1), hoverinfo="skip"))
     fig.update_layout(xaxis_title="Expiration (third Friday of the contract month)",
                       yaxis_title="Price above the nearest contract (%)",
                       legend=dict(orientation="h", y=1.02, yanchor="bottom", x=0))
-    return style(fig, height=440, title=_title(f"The E-mini S&P 500 futures curve, settlements of {pd.Timestamp(on):%B %-d, %Y}"),
+    return style(fig, height=440, title=_title(f"The E-mini S&P 500 futures curve, settlements of {pd.Timestamp(on):%B %#d, %Y}"),
                  margin=dict(l=70, r=20, t=90, b=50))
 
 
@@ -137,7 +137,7 @@ def fig_expiration_calendar(session, curve, on, horizon_days=smile.HORIZON_DAYS)
     fig.add_trace(go.Scatter(
         x=futures["expiration"], y=futures["symbol"], mode="markers", name="The future's own expiration",
         marker=dict(symbol="diamond", size=13, color=GREY),
-        hovertemplate="%{y} expires %{x|%b %-d, %Y}<extra></extra>"))
+        hovertemplate="%{y} expires %{x|%b %#d, %Y}<extra></extra>"))
     bracket = expiries["expiration"].isin([near, far])
     for mask, name, color in [(~bracket, "An option expiration (end of month)", BLUE),
                               (bracket, "The two that bracket 30 days", RED)]:
@@ -146,7 +146,7 @@ def fig_expiration_calendar(session, curve, on, horizon_days=smile.HORIZON_DAYS)
             x=e["expiration"], y=e["underlying"], mode="markers", name=name,
             marker=dict(size=11, color=color, line=dict(color="white", width=1)),
             customdata=np.column_stack([e["days"], e["contracts"]]),
-            hovertemplate="options expiring %{x|%b %-d, %Y}<br>%{customdata[0]} days away<br>"
+            hovertemplate="options expiring %{x|%b %#d, %Y}<br>%{customdata[0]} days away<br>"
                           "%{customdata[1]} contracts<br>exercise into %{y}<extra></extra>"))
     horizon = on + pd.Timedelta(days=horizon_days)
     fig.add_vline(x=horizon, line_dash="dot", line_color=GREY)
@@ -155,7 +155,7 @@ def fig_expiration_calendar(session, curve, on, horizon_days=smile.HORIZON_DAYS)
     fig.update_layout(yaxis=dict(title="Underlying future", categoryorder="array", categoryarray=order),
                       xaxis_title="Expiration date",
                       legend=dict(orientation="h", y=1.02, yanchor="bottom", x=0))
-    return style(fig, height=380, title=_title(f"What expires when, as of {on:%B %-d, %Y}"),
+    return style(fig, height=380, title=_title(f"What expires when, as of {on:%B %#d, %Y}"),
                  margin=dict(l=90, r=20, t=90, b=50))
 
 
@@ -187,7 +187,7 @@ def fig_parity(chain, forward, rate):
                       yaxis_title="Call minus put (index points)",
                       legend=dict(orientation="h", y=1.02, yanchor="bottom", x=0))
     expiry = pd.Timestamp(chain["expiration"].iloc[0])
-    return style(fig, height=460, title=_title(f"Put-call parity, options expiring {expiry:%B %-d, %Y} ({days} days)"),
+    return style(fig, height=460, title=_title(f"Put-call parity, options expiring {expiry:%B %#d, %Y} ({days} days)"),
                  margin=dict(l=70, r=20, t=90, b=50))
 
 
@@ -318,7 +318,7 @@ def fig_surface(options, session, date, rate):
         xaxis_title="Strike / index level", yaxis_title="Days to expiration", zaxis_title="Implied vol (%)",
         camera=dict(eye=dict(x=1.6, y=-1.6, z=0.9)), aspectratio=dict(x=1.2, y=1.2, z=0.7),
     )
-    return style(fig, height=600, title=f"The E-mini S&P 500 volatility surface, settlements of {pd.Timestamp(date):%B %-d, %Y}")
+    return style(fig, height=600, title=f"The E-mini S&P 500 volatility surface, settlements of {pd.Timestamp(date):%B %#d, %Y}")
 
 
 # --------------------------------------------------------------------------
@@ -369,7 +369,7 @@ def fig_distribution(options, session, date, rate, n_expiries=5):
     for i, row in enumerate(expiries.itertuples()):
         mask = [False] * n
         mask[i * traces_per:(i + 1) * traces_per] = [True] * traces_per
-        buttons.append(dict(label=f"{int(row.days_to_expiry)} days ({row.expiration:%b %-d})",
+        buttons.append(dict(label=f"{int(row.days_to_expiry)} days ({row.expiration:%b %#d})",
                             method="update", args=[{"visible": mask}]))
     for r in (1, 2, 3):
         fig.add_vline(x=0.8, line_dash="dot", line_color=GREY, row=r, col=1)
@@ -405,7 +405,7 @@ def fig_svix_weights(cdf, date):
                       xaxis_title="Strike / index level",
                       yaxis_title="Share of the total, per 1% band of strikes (%)")
     days = int(round(tau * 365))
-    return style(fig, height=500, title=_title(f"Where SVIX comes from: {days}-day E-mini options, {pd.Timestamp(date):%B %-d, %Y}"),
+    return style(fig, height=500, title=_title(f"Where SVIX comes from: {days}-day E-mini options, {pd.Timestamp(date):%B %#d, %Y}"),
                  margin=dict(l=60, r=20, t=90, b=50))
 
 
@@ -440,7 +440,7 @@ def fig_crash_beliefs(cdf, date, gammas=(1, 2, 3, 4, 5)):
         legend=dict(orientation="h", y=1.02, yanchor="bottom", x=0),
     )
     days = int(round(cdf.maturity_years * 365))
-    return style(fig, height=560, title=_title(f"Three beliefs about a crash, {days}-day options, {pd.Timestamp(date):%B %-d, %Y}"),
+    return style(fig, height=560, title=_title(f"Three beliefs about a crash, {days}-day options, {pd.Timestamp(date):%B %#d, %Y}"),
                  margin=dict(l=70, r=20, t=90, b=110))
 
 
@@ -496,7 +496,7 @@ def fig_crash_history(index, martin):
                                     ("prob_log_utility", "Log investor (Martin 2017)", GREEN, 1.2),
                                     ("prob_power_utility", "Power utility, risk aversion 2 (Martin and Shi 2025)", PURPLE, 1)]:
         fig.add_trace(go.Scatter(x=idx["date"], y=percent(idx[col]), name=name, line=dict(color=color, width=width),
-                                 opacity=0.85, hovertemplate="%{x|%b %-d, %Y}<br>%{y:.2f}%<extra>" + name + "</extra>"))
+                                 opacity=0.85, hovertemplate="%{x|%b %#d, %Y}<br>%{y:.2f}%<extra>" + name + "</extra>"))
     fig.add_trace(go.Scatter(x=martin["date"], y=percent(martin["m1"]), name="Martin's published log-investor series (monthly)",
                              mode="markers", marker=dict(color="black", size=4),
                              hovertemplate="%{x|%b %Y}<br>%{y:.2f}%<extra>Martin</extra>"))
