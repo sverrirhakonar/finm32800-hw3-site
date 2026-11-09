@@ -62,8 +62,34 @@ def svix_squared(cdf):
     0.0401
     """
     ## TODO: Implement this function as specified in the docstring above.
-    raise NotImplementedError(
-        "Implement svix_squared (see HOMEWORK INSTRUCTIONS at the top of this file)"
+    grid = cdf.grid
+    forward = cdf.forward
+    put_grid = cdf.put_grid
+    call_grid = cdf.call_grid
+
+    put_mask = grid <= forward
+    call_mask = grid > forward
+
+    put_strikes = np.append(grid[put_mask], forward)
+    put_prices = np.append(
+        put_grid[put_mask],
+        np.interp(forward, grid, put_grid),
+    )
+
+    call_strikes = np.insert(grid[call_mask], 0, forward)
+    call_prices = np.insert(
+        call_grid[call_mask],
+        0,
+        np.interp(forward, grid, call_grid),
+    )
+
+    put_integral = np.trapezoid(put_prices, put_strikes)
+    call_integral = np.trapezoid(call_prices, call_strikes)
+
+    return float(
+        2.0
+        * (put_integral + call_integral)
+        / (cdf.maturity_years * forward)
     )
 
 
