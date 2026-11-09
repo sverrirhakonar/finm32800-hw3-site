@@ -27,6 +27,10 @@ path = "_output/02_svix_and_crash_probability_ipynb.ipynb"
 # the two entries above: a name, a description, and the path of the executed
 # notebook that `doit` leaves in `_output/`.
 
+[notebooks.03_daily_monitor_ipynb]
+name = "The Daily SVIX Monitor"
+description = "A daily monitor of SVIX, VIX, and option-implied crash probabilities for the S&P 500."
+path = "_output/03_daily_monitor_ipynb.ipynb"
 
 [notebooks.04_single_name_crash_bounds_ipynb]
 name = "Crash Bounds for Single Names (Martin and Shi 2025)"
@@ -61,6 +65,15 @@ recent session."""
 # reader needs to know (`docs`). The chart below refers to this entry by
 # name, so the site does not build until it exists.
 
+[dataframes.svix_monitor_history]
+name = "SVIX Monitor History"
+description = "Daily history of SVIX, VIX, and option-implied crash probabilities for the S&P 500."
+path = "_output/svix_monitor_history.csv"
+date_col = "date"
+pull_method = "Computed by src/monitor.py from Databento settlements and FRED rates."
+docs = """One row per trading session. SVIX is annualized volatility in percent;
+the probability columns are option-implied probabilities of a 20% or 10% drop.
+The history is updated by the daily monitor workflow."""
 
 [charts]
 
